@@ -27,4 +27,4 @@ only once. I'm working on it to support multiple opening.
 
 License
 ---
-GPL V2
+GPLv2
