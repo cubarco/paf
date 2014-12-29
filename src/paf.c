@@ -29,7 +29,7 @@
 /*
  * Get and replace the pattern
  */
-int gr_filename(char *filename, char **outargs, char **inargs)
+int gr_filename(char *filename, char **outargs, int *force, char **inargs)
 {
     int fnlen=0;
     int returnv=-1;
@@ -46,6 +46,8 @@ int gr_filename(char *filename, char **outargs, char **inargs)
                 *paout = strdup(filename);
                 returnv = 1;
             }
+            if ((*pain)[1] == '!')
+                *force = 1;
         } else
             *paout = strdup(*pain);
         paout++;
@@ -61,7 +63,7 @@ void usage(char *command)
          "[PAF] PATTERN:\n"
          "[PAF] \t{}:\t\t\tPATTERN will be replaced with /tmp/default\n"
          "[PAF] \t{/path/to/file}:\tPATTERN will be replaced with /path/to/file\n"
-         "[PAF] \t{!/path/to/file}:\tForce mode(not implemented)\n",
+         "[PAF] \t{!/path/to/file}:\tForce mode\n",
          command);
 }
 
@@ -69,16 +71,27 @@ int main(int argc, char **argv)
 {
     int wfd;
     int fnresult;
+    int force=0;
     pid_t child_pid;
     char buf[BUFFSIZE];
     char filename[100];
     char *argste[argc];
 
+    void sigint_handler()
+    {
+        kill(child_pid, SIGINT);
+        close(wfd);
+        unlink(filename);
+        waitpid(child_pid, NULL, 0);
+        exit(1);
+    }
+    signal(SIGINT, sigint_handler);
+
     if (argc < 3)
         usage(*argv);
 
     bzero(filename, 100);
-    fnresult = gr_filename(filename, argste, argv + 1);
+    fnresult = gr_filename(filename, argste, &force, argv + 1);
     if (fnresult == -1)
         usage(*argv);
     else if (fnresult == 0) {
@@ -88,7 +101,7 @@ int main(int argc, char **argv)
         LOGD("[PAF] Filename: %s\n", filename);
     }
 
-    if (mkfifo(filename, FIFO_MODE) < 0 && errno == EEXIST)
+    if (mkfifo(filename, FIFO_MODE) < 0 && errno == EEXIST && !force)
         LOGE("[PAF] %s exits, quiting.\n", filename);
 
     if ((child_pid = fork()) == 0) {
