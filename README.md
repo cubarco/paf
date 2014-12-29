@@ -17,11 +17,11 @@ PATTERN:
 Examples
 ---
 
-* ###MD5SUM with filenames
+### MD5SUM with filenames
 ```console
 $ tar cf - . | paf md5sum {/tmp/foo.tar}
 ```
-* ###Pacman install from folders
+### Pacman install from folders
 If you are using pacman as a package manager, paf enables you install a software
 from a directory.
 <br \>
