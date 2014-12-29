@@ -2,7 +2,7 @@ Pipe as file
 ===
 Paf transmits data from `stdin` to a `FIFO` named by user.
 As some programs do not regard `-` as `stdin`, or sometimes the filename is
-significant, paf is developed to deal with this situation. 
+significant, paf is developed to deal with this situation.
 
 Usage
 ---
@@ -14,10 +14,22 @@ PATTERN:
   {!/path/to/file}:       Force mode
 ```
 
-Example
+Examples
 ---
-```sh
+
+* ###MD5SUM with filenames
+```console
 tar cf - . | paf md5sum {/tmp/foo.tar}
+```
+* ###Pacman install from folders
+If you are using pacman as a package manager, paf enables you install a software
+from a directory.
+<br \>
+Assuming that `${pkgdir}` is the folder generated with `makepkg --noarchive`. Run
+following commands and the package will be installed without archiving.
+```console
+$ cd ${pkgdir}
+# tar -cf - {*,.*} | paf pacman -U {/tmp/foo.tar}
 ```
 
 Todo
