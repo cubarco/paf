@@ -39,7 +39,7 @@ int gr_filename(char *filename, char **outargs, char **inargs)
         if ((*pain)[0] == '{' && (*pain)[strlen(*pain) - 1] == '}') {
             fnlen = strlen(*pain) - 2;
             if (fnlen <= 0) {
-                *paout = strdup(*pain);
+                *paout = strdup(DEFUALT_FILE);
                 returnv = 0;
             } else {
                 strncpy(filename, *pain + 1, fnlen);
