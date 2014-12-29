@@ -27,7 +27,7 @@
 #define BUFFSIZE 4096
 
 /*
- * Get and replace the matched parameter
+ * Get and replace the pattern
  */
 int gr_filename(char *filename, char **outargs, char **inargs)
 {
@@ -55,6 +55,16 @@ int gr_filename(char *filename, char **outargs, char **inargs)
     return returnv;
 }
 
+void usage(char *command)
+{
+    LOGE("[PAF] usage: %s COMMAND [OPTION...] PATTERN [OPTION...]\n"
+         "[PAF] PATTERN:\n"
+         "[PAF] \t{}:\t\t\tPATTERN will be replaced with /tmp/default\n"
+         "[PAF] \t{/path/to/file}:\tPATTERN will be replaced with /path/to/file\n"
+         "[PAF] \t{!/path/to/file}:\tForce mode(not implemented)\n",
+         command);
+}
+
 int main(int argc, char **argv)
 {
     int wfd;
@@ -65,12 +75,12 @@ int main(int argc, char **argv)
     char *argste[argc];
 
     if (argc < 3)
-        LOGE("[PAF] usage: %s COMMAND [OPTIONS] {/path/to/file} [OPTIONS]\n", *argv);
+        usage(*argv);
 
     bzero(filename, 100);
     fnresult = gr_filename(filename, argste, argv + 1);
     if (fnresult == -1)
-        LOGE("[PAF] usage: %s COMMAND [OPTIONS] {/path/to/file} [OPTIONS]\n", *argv);
+        usage(*argv);
     else if (fnresult == 0) {
         LOGD("[PAF] Filename not found, using default filename(/tmp/default).\n");
         strcpy(filename, DEFUALT_FILE);
