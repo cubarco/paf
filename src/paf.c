@@ -32,22 +32,26 @@
 int gr_filename(char *filename, char **outargs, int *force, char **inargs)
 {
     int fnlen=0;
+    int offset=1;
     int returnv=-1;
     char **pain = inargs;
     char **paout = outargs;
     while (*pain) {
         if ((*pain)[0] == '{' && (*pain)[strlen(*pain) - 1] == '}') {
-            fnlen = strlen(*pain) - 2;
+            if ((*pain)[1] == '!')
+                *force = 1;
+            else
+                *force = 0;
+            fnlen = strlen(*pain) - 2 - *force;
+            offset = 1 + *force;
             if (fnlen <= 0) {
                 *paout = strdup(DEFUALT_FILE);
                 returnv = 0;
             } else {
-                strncpy(filename, *pain + 1, fnlen);
+                strncpy(filename, *pain + offset, fnlen);
                 *paout = strdup(filename);
                 returnv = 1;
             }
-            if ((*pain)[1] == '!')
-                *force = 1;
         } else
             *paout = strdup(*pain);
         paout++;
