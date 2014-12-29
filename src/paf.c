@@ -117,6 +117,7 @@ int main(int argc, char **argv)
         execvp(argv[1], argste);
     }
 
+    /* TODO working on the FIFO for multiple opening */
     wfd = open(filename, O_WRONLY, NULL);
     bzero(buf, BUFFSIZE);
     /* sendfile does not support pipe, use splice instead */
