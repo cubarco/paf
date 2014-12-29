@@ -22,7 +22,7 @@ tar cf - . | paf md5sum {/tmp/foo.tar}
 
 Todo
 ---
-Because of the limitation of FIFO, the filename passed to COMMAND can be opened
+Due to the limitation of `pipe`, the filename passed to `COMMAND` can be opened
 only once. I'm working on it to support multiple opening.
 
 License
