@@ -33,24 +33,25 @@ int gr_filename(char *filename, char **outargs, char **inargs)
 {
     int fnlen=0;
     int returnv=-1;
-    char **pa = inargs;
-    char **pate = outargs;
-    while (*pa) {
-        if ((*pa)[0] == '{' && (*pa)[strlen(*pa) - 1] == '}') {
-            fnlen = strlen(*pa) - 2;
+    char **pain = inargs;
+    char **paout = outargs;
+    while (*pain) {
+        if ((*pain)[0] == '{' && (*pain)[strlen(*pain) - 1] == '}') {
+            fnlen = strlen(*pain) - 2;
             if (fnlen <= 0) {
-                *pate = strdup(*pa);
+                *paout = strdup(*pain);
                 returnv = 0;
             } else {
-                strncpy(filename, *pa + 1, fnlen);
-                *pate = strdup(filename);
+                strncpy(filename, *pain + 1, fnlen);
+                *paout = strdup(filename);
                 returnv = 1;
             }
         } else
-            *pate = strdup(*pa);
-        pate++;
-        pa++;
+            *paout = strdup(*pain);
+        paout++;
+        pain++;
     }
+    *paout = NULL;
     return returnv;
 }
 
@@ -61,7 +62,7 @@ int main(int argc, char **argv)
     pid_t child_pid;
     char buf[BUFFSIZE];
     char filename[100];
-    char *argste[argc - 2];
+    char *argste[argc];
 
     if (argc < 3)
         LOGE("[PAF] usage: %s COMMAND [OPTIONS] {/path/to/file} [OPTIONS]\n", *argv);
