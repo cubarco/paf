@@ -25,7 +25,12 @@
 
 #define FIFO_MODE (S_IRUSR | S_IWUSR)
 #define DEFUALT_FILE "/tmp/default"
-#define BUFFSIZE 4096
+#define BUFFSIZE 1024
+
+struct filenode {
+    char *buf;
+    struct filenode *next;
+};
 
 /*
  * Get and replace the pattern
@@ -72,25 +77,47 @@ void usage(char *command)
          command);
 }
 
+static void freeall(struct filenode **pf)
+{
+    struct filenode **pp = pf;
+    struct filenode *tmp;
+    while (*pp) {
+        tmp = *pp;
+        free(tmp->buf);
+        pp = &tmp->next;
+        free(tmp);
+    }
+}
+
 int main(int argc, char **argv)
 {
     int wfd;
     int fnresult;
+    int ioresult;
     int force=0;
     pid_t child_pid;
     char buf[BUFFSIZE];
     char filename[100];
     char *argste[argc];
+    struct filenode *filehead;
+    struct filenode **pf = &filehead;
 
-    void sigint_handler()
+    void sig_handler(int sig)
     {
-        kill(child_pid, SIGINT);
-        close(wfd);
-        unlink(filename);
-        waitpid(child_pid, NULL, 0);
-        exit(1);
+        switch (sig) {
+            case SIGINT:
+                kill(child_pid, SIGINT);
+            case SIGCHLD:
+                close(wfd);
+                unlink(filename);
+                waitpid(child_pid, NULL, 0);
+                freeall(&filehead);
+                exit(0);
+        }
     }
-    signal(SIGINT, sigint_handler);
+    signal(SIGINT, sig_handler);
+    signal(SIGCHLD, sig_handler);
+    signal(SIGPIPE, SIG_IGN);
 
     if (argc < 3)
         usage(*argv);
@@ -117,13 +144,46 @@ int main(int argc, char **argv)
         execvp(argv[1], argste);
     }
 
-    /* TODO working on the FIFO for multiple opening */
     wfd = open(filename, O_WRONLY, NULL);
     bzero(buf, BUFFSIZE);
-    /* sendfile does not support pipe, use splice instead */
-    while (splice(STDIN_FILENO, NULL, wfd, NULL, 1024, 0)) ;
+
+    /* save all data from stdin to memory and write to FIFO */
+    while ( (ioresult = read(STDIN_FILENO, buf, BUFFSIZE)) ) {
+        *pf = malloc(sizeof(struct filenode));
+        (*pf)->next = malloc(sizeof(struct filenode));
+        (*pf)->buf = malloc(BUFFSIZE);
+        memcpy((*pf)->buf, buf, BUFFSIZE);
+        write(wfd, buf, ioresult);
+        pf = &(*pf)->next;
+    }
+    free(*pf);
+    *pf = NULL;
     close(wfd);
+    unlink(filename); /* TODO
+                       * The read end of FIFO does not been closed immedietely
+                       * even though the write end has been closed.
+                       * Use unlink() and mkfifo() again to make sure the
+                       * following open() will be blocked.
+                       * Although this is not a good practice.
+                       */
+
+    /* start loop for multiple opening */
+    for (;;) {
+        pf = &filehead;
+        mkfifo(filename, FIFO_MODE);
+        wfd = open(filename, O_WRONLY, NULL);
+        while (*pf) {
+            ioresult = write(wfd, (*pf)->buf, BUFFSIZE);
+            if (ioresult == EPIPE)
+                break;
+            pf = &(*pf)->next;
+        }
+        close(wfd);
+        unlink(filename);
+    }
+
     unlink(filename);
     waitpid(child_pid, NULL, 0);
+    freeall(&filehead);
     return 0;
 }
