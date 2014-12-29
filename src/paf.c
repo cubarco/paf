@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -118,8 +119,8 @@ int main(int argc, char **argv)
 
     wfd = open(filename, O_WRONLY, NULL);
     bzero(buf, BUFFSIZE);
-    while (read(STDIN_FILENO, buf, 1024)) /* TODO sendfile not working, confusing */
-        write(wfd, buf, 1024);
+    /* sendfile does not support pipe, use splice instead */
+    while (splice(STDIN_FILENO, NULL, wfd, NULL, 1024, 0)) ;
     close(wfd);
     unlink(filename);
     waitpid(child_pid, NULL, 0);
