@@ -29,6 +29,7 @@
 
 struct filenode {
     char *buf;
+    int len;
     struct filenode *next;
 };
 
@@ -153,6 +154,7 @@ int main(int argc, char **argv)
         (*pf)->next = malloc(sizeof(struct filenode));
         (*pf)->buf = malloc(BUFFSIZE);
         memcpy((*pf)->buf, buf, BUFFSIZE);
+        (*pf)->len = ioresult;
         write(wfd, buf, ioresult);
         pf = &(*pf)->next;
     }
@@ -173,7 +175,7 @@ int main(int argc, char **argv)
         mkfifo(filename, FIFO_MODE);
         wfd = open(filename, O_WRONLY, NULL);
         while (*pf) {
-            ioresult = write(wfd, (*pf)->buf, BUFFSIZE);
+            ioresult = write(wfd, (*pf)->buf, (*pf)->len);
             if (ioresult == EPIPE)
                 break;
             pf = &(*pf)->next;
