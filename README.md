@@ -7,7 +7,7 @@ significant, paf is developed to deal with this situation.
 Usage
 ---
 ```
-Usage: ./paf COMMAND [OPTION...] PATTERN... [OPTION...]
+Usage: paf COMMAND [OPTION...] PATTERN... [OPTION...]
 PATTERN:
   {}:                     PATTERN will be replaced with /tmp/default
   {/path/to/file}:        PATTERN will be replaced with /path/to/file
