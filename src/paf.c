@@ -162,7 +162,7 @@ int main(int argc, char **argv)
         *pf = malloc(sizeof(struct filenode));
         (*pf)->next = malloc(sizeof(struct filenode));
         (*pf)->buf = malloc(BUFFSIZE);
-        memcpy((*pf)->buf, buf, BUFFSIZE);
+        memcpy((*pf)->buf, buf, ioresult);
         (*pf)->len = ioresult;
         /* if read end has been closed, do not write to it anymore */
         if (pipebk != EPIPE)
