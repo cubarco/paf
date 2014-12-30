@@ -104,7 +104,7 @@ int main(int argc, char **argv)
     char buf[BUFFSIZE];
     char filename[100];
     char *argste[argc];
-    struct filenode *filehead=NULL;
+    struct filenode *filehead = NULL;
     struct filenode **pf = &filehead;
 
     void sig_handler(int sig)
@@ -116,7 +116,6 @@ int main(int argc, char **argv)
                 close(wfd);
                 unlink(filename);
                 waitpid(child_pid, NULL, 0);
-//                freeall(&filehead);
                 exit(0);
         }
     }
@@ -149,7 +148,13 @@ int main(int argc, char **argv)
         execvp(argv[1], argste);
     }
 
+    /*
+     * Unlink filename right after opening the write end, then mkfifo() for a new
+     * fifo. In this way, the read end will block for next open()
+     */
     wfd = open(filename, O_WRONLY, NULL);
+    unlink(filename);
+    mkfifo(filename, FIFO_MODE);
     bzero(buf, BUFFSIZE);
 
     /* save all data from stdin to memory and write to FIFO */
@@ -160,29 +165,20 @@ int main(int argc, char **argv)
         memcpy((*pf)->buf, buf, BUFFSIZE);
         (*pf)->len = ioresult;
         /* if read end has been closed, do not write to it anymore */
-        if (pipebk != EPIPE) {
+        if (pipebk != EPIPE)
             pipebk = write(wfd, buf, ioresult);
-            if (pipebk == EPIPE)
-                close(wfd);
-        }
         pf = &(*pf)->next;
     }
     free(*pf);
     *pf = NULL;
     close(wfd);
-    unlink(filename); /* TODO
-                       * The read end of FIFO is not closed immedietely even
-                       * though the write end has been closed.
-                       * Use unlink() and mkfifo() again to make sure the
-                       * following open() will be blocked.
-                       * Anyhow, this is not a good practice.
-                       */
 
-    /* start loop for multiple opening */
+    /* start second loop for multiple opening */
     for (;;) {
         pf = &filehead;
-        mkfifo(filename, FIFO_MODE);
         wfd = open(filename, O_WRONLY, NULL);
+        unlink(filename);
+        mkfifo(filename, FIFO_MODE);
         while (*pf) {
             ioresult = write(wfd, (*pf)->buf, (*pf)->len);
             if (ioresult == EPIPE)
@@ -190,11 +186,9 @@ int main(int argc, char **argv)
             pf = &(*pf)->next;
         }
         close(wfd);
-        unlink(filename);
     }
 
     unlink(filename);
     waitpid(child_pid, NULL, 0);
-//    freeall(&filehead);
     return 0;
 }
