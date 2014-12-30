@@ -160,11 +160,11 @@ int main(int argc, char **argv)
     *pf = NULL;
     close(wfd);
     unlink(filename); /* TODO
-                       * The read end of FIFO does not been closed immedietely
-                       * even though the write end has been closed.
+                       * The read end of FIFO is not closed immedietely even
+                       * though the write end has been closed.
                        * Use unlink() and mkfifo() again to make sure the
                        * following open() will be blocked.
-                       * Although this is not a good practice.
+                       * Anyhow, this is not a good practice.
                        */
 
     /* start loop for multiple opening */
