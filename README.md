@@ -21,9 +21,9 @@ Examples
 ```console
 $ tar cf - . | paf md5sum {/tmp/foo.tar}
 ```
-##### Pacman install from folders
-If you are using pacman as a package manager, paf enables you install a software
-from a directory.
+##### Pacman installing from folders
+If you are using pacman as a package manager, paf enables you to install software 
+from a folder.
 <br \>
 Assuming that `${pkgdir}` is the folder generated with `makepkg --noarchive`. Run
 following commands and the package will be installed without archiving.
