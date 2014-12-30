@@ -96,6 +96,7 @@ int main(int argc, char **argv)
     int fnresult;
     int ioresult;
     int force=0;
+    int pipebk=0;
     pid_t child_pid;
     char buf[BUFFSIZE];
     char filename[100];
@@ -155,7 +156,12 @@ int main(int argc, char **argv)
         (*pf)->buf = malloc(BUFFSIZE);
         memcpy((*pf)->buf, buf, BUFFSIZE);
         (*pf)->len = ioresult;
-        write(wfd, buf, ioresult);
+        /* if read end has been closed, do not write to it anymore */
+        if (pipebk != EPIPE) {
+            pipebk = write(wfd, buf, ioresult);
+            if (pipebk == EPIPE)
+                close(wfd);
+        }
         pf = &(*pf)->next;
     }
     free(*pf);
