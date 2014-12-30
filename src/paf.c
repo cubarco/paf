@@ -116,7 +116,7 @@ int main(int argc, char **argv)
                 close(wfd);
                 unlink(filename);
                 waitpid(child_pid, NULL, 0);
-                freeall(&filehead);
+//                freeall(&filehead);
                 exit(0);
         }
     }
@@ -195,6 +195,6 @@ int main(int argc, char **argv)
 
     unlink(filename);
     waitpid(child_pid, NULL, 0);
-    freeall(&filehead);
+//    freeall(&filehead);
     return 0;
 }
