@@ -7,11 +7,14 @@ significant, paf is developed to deal with this situation.
 Usage
 ---
 ```
-paf COMMAND [OPTION...] PATTERN [OPTION...]
+Usage: ./paf COMMAND [OPTION...] PATTERN... [OPTION...]
 PATTERN:
   {}:                     PATTERN will be replaced with /tmp/default
   {/path/to/file}:        PATTERN will be replaced with /path/to/file
   {!/path/to/file}:       Force mode
+
+Note: If there are more than one PATTERNs in a single command line, the 
+      PATTERNs should be the same.
 ```
 
 Examples

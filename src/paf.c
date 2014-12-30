@@ -70,11 +70,15 @@ int gr_filename(char *filename, char **outargs, int *force, char **inargs)
 
 void usage(char *command)
 {
-    LOGE("[PAF] usage: %s COMMAND [OPTION...] PATTERN [OPTION...]\n"
-         "[PAF] PATTERN:\n"
-         "[PAF] \t{}:\t\t\tPATTERN will be replaced with /tmp/default\n"
-         "[PAF] \t{/path/to/file}:\tPATTERN will be replaced with /path/to/file\n"
-         "[PAF] \t{!/path/to/file}:\tForce mode\n",
+    LOGE(
+"[PAF] Usage: %s COMMAND [OPTION...] PATTERN... [OPTION...]\n"
+"[PAF] PATTERN:\n"
+"[PAF] \t{}:\t\t\tPATTERN will be replaced with /tmp/default\n"
+"[PAF] \t{/path/to/file}:\tPATTERN will be replaced with /path/to/file\n"
+"[PAF] \t{!/path/to/file}:\tForce mode\n"
+"[PAF] \n"
+"[PAF] Note: If there are more than one PATTERNs in a single command line, the \n"
+"[PAF]       PATTERNs should be the same.\n",
          command);
 }
 
