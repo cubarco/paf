@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -105,7 +104,7 @@ int main(int argc, char **argv)
     char buf[BUFFSIZE];
     char filename[100];
     char *argste[argc];
-    struct filenode *filehead;
+    struct filenode *filehead=NULL;
     struct filenode **pf = &filehead;
 
     void sig_handler(int sig)
