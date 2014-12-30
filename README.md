@@ -28,7 +28,7 @@ $ tar cf - . | paf md5sum {/tmp/foo.tar}
 If you are using pacman as a package manager, paf enables you to install software 
 from a folder.
 <br \>
-Assuming that `${pkgdir}` is the folder generated with `makepkg --noarchive`. Run
+Assuming that `${pkgdir}` is the folder generated with `makepkg`. Run
 following commands and the package will be installed without archiving.
 ```console
 $ cd ${pkgdir}
