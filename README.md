@@ -37,7 +37,7 @@ $ cd ${pkgdir}
 
 Todo
 ---
-- [x] ~~Due to the limitation of `pipe`, the filename passed to `COMMAND` can be
+* [x] ~~Due to the limitation of `pipe`, the filename passed to `COMMAND` can be
 opened only once. I'm working on it to support multiple opening.~~
 
 License
