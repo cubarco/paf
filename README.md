@@ -42,4 +42,4 @@ opened only once. I'm working on it to support multiple opening.~~
 
 License
 ---
-GPLv2
+[GPLv2](http://www.gnu.org/licenses/gpl-2.0.html)
